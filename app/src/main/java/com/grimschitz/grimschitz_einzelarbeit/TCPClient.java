@@ -5,6 +5,7 @@ import android.app.Activity;
 import android.os.Bundle;
 import android.os.Handler;
 import android.os.Message;
+import android.os.StrictMode;
 import android.util.Log;
 import android.view.View;
 import android.widget.Button;
@@ -36,13 +37,15 @@ public class TCPClient extends Activity{
     public String getMsg(String martrknr){
         String str = "Unable";
 
+        StrictMode.ThreadPolicy gfgPolicy = new StrictMode.ThreadPolicy.Builder().permitAll().build();
+        StrictMode.setThreadPolicy(gfgPolicy);
         try {
-            Log.d("DB","Trying get ip: " + hostname +"\n");
+           // Log.d("DB","Trying get ip: " + hostname +"\n");
 
-            byte[] ipAddr = new byte[] {(byte) 143, (byte) 205, (byte) 174, (byte) 165};
-            InetAddress serverAddr = InetAddress.getByAddress("se2-isys.aau.at",ipAddr); //InetAddress.getByName(hostname);
+            //byte[] ipAddr = new byte[] {(byte) 143, (byte) 205, (byte) 174, (byte) 165};
+           // InetAddress serverAddr = InetAddress.getByAddress("se2-isys.aau.at",ipAddr); //InetAddress.getByName(hostname);
             Log.d("DB","Attempt Connecting..." + hostname +"\n");
-            Socket socket = new Socket(serverAddr, port);
+            Socket socket = new Socket("se2-isys.aau.at", port);
 
             //made connection, setup the read (in) and write (out)
             out = new PrintWriter( new BufferedWriter( new OutputStreamWriter(socket.getOutputStream())),true);
@@ -51,7 +54,7 @@ public class TCPClient extends Activity{
             //now send a message to the server and then read back the response.
             try {
                 //write a message to the server
-                Log.d("DB","Attempting to send message ...\n");
+                Log.d("DB","Attempting to send message ..."+ martrknr + "\n");
                 out.println(martrknr);
                 Log.d("DB","Message sent...\n");
 
@@ -72,6 +75,8 @@ public class TCPClient extends Activity{
 
         } catch (Exception e) {
             Log.d("DB","Unable to connect...\n");
+            Log.d("DB","error",e.fillInStackTrace());
+
         }
         return str;
     }
